@@ -98,11 +98,97 @@ def git_repo_status(local_path: str) -> dict:
             "message": f"An unexpected error occurred: {str(e)}",
             "data": {}
         }
+
+def read_file_content(repo_local_path: str, file_path_in_repo: str) -> dict:
+    """
+    Read the content of a file in a git repository.
+    Args:
+        repo_local_path: The path to the git repository.
+        file_path: The path to the file to read.
+    Returns:
+        status: success or error
+        message: success or error message
+        data: content of the file
+    """
+    full_repo_path = os.path.join(TEMP_REPO_DIR, repo_local_path)
+    full_file_path = os.path.join(full_repo_path, file_path_in_repo)
+
+    if not os.path.exists(full_file_path):
+        return {
+            "status": "error",
+            "message": f"File not found: {full_file_path}",
+            "data": {}
+        }
+    if not os.path.isfile(full_file_path):
+        return {
+            "status": "error",
+            "message": f"Path is not a file: {full_file_path}",
+            "data": {}
+        }
+    try:
+        with open(full_file_path, "r", encoding="utf-8") as file:
+            content = file.read()
+        return {
+            "status": "success",
+            "content": content
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"An unexpected error occurred: {str(e)}",
+            "data": {}
+        }
+
+def list_repo_contents(repo_local_path: str, path_in_repo: str = "") -> dict:
+    """
+    List the contents of a directory in a git repository.
+    Args:
+        repo_local_path: The path to the git repository.
+        path_in_repo: The path to the directory to list.
+    Returns:
+        status: success or error
+        message: success or error message
+        data: list of files and directories
+    """
+    full_path = os.path.join(TEMP_REPO_DIR, repo_local_path, path_in_repo)
+    if not os.path.exists(full_path):
+        return {
+            "status": "error",
+            "message": f"Path not found: {path_in_repo} in {repo_local_path}"
+        }
+    if not os.path.isdir(full_path):   
+        return {
+            "status": "error",
+            "message": f"Path is not a directory: {full_path}"
+        }
+    try:
+        contents = []
+        for item in os.listdir(full_path):
+            item_path = os.path.join(full_path, item)
+            item_type = "directory" if os.path.isdir(item_path) else "file"
+            contents.append({
+                "name": item,
+                "type": item_type
+            })
+        return {
+            "status": "success",
+            "contents": contents
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error listing contents: {str(e)}",
+            "contents": []
+        }
         
-        
-        
-result = clone_repo(repo_url="https://github.com/zganjei/symptom-checker-frontend", branch="main")
+result = clone_repo(repo_url="https://github.com/zganjei/dev_assistant_crew", branch="main")
 print(result)
 
 result2 = git_repo_status(result["local_path"])
 print(result2)
+
+result3 = read_file_content(result["local_path"].split("\\")[-1], "README.md")
+print(result3)
+
+result4 = list_repo_contents(result["local_path"].split("\\")[-1], "mcp_tools")
+print(result4)
