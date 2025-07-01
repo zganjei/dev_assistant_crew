@@ -151,10 +151,11 @@ def list_repo_contents(repo_local_path: str, path_in_repo: str = "") -> dict:
         data: list of files and directories
     """
     full_path = os.path.join(TEMP_REPO_DIR, repo_local_path, path_in_repo)
+    print(f"Listing contents of {full_path}...")
     if not os.path.exists(full_path):
         return {
             "status": "error",
-            "message": f"Path not found: {path_in_repo} in {repo_local_path}"
+            "message": f"Path not found: {full_path}"
         }
     if not os.path.isdir(full_path):   
         return {
@@ -181,14 +182,3 @@ def list_repo_contents(repo_local_path: str, path_in_repo: str = "") -> dict:
             "contents": []
         }
         
-result = clone_repo(repo_url="https://github.com/zganjei/dev_assistant_crew", branch="main")
-print(result)
-
-result2 = git_repo_status(result["local_path"])
-print(result2)
-
-result3 = read_file_content(result["local_path"].split("\\")[-1], "README.md")
-print(result3)
-
-result4 = list_repo_contents(result["local_path"].split("\\")[-1], "mcp_tools")
-print(result4)
