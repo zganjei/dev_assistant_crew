@@ -1,17 +1,10 @@
 # AI-Powered Code & Repository Manager with MCP Integration
 
-To run the tool, first activate a virtual environment
-python -m venv venv
-.\venv\Scripts\activate
+## Features:
+ - Checking style of Python code in a repo using Flake8
 
-Install dependencies
 
-pip install -r mcp_services/git_service/requirements.txt
-pip install -r crew_app/requirements.txt
-
-Local Testing of MCP Git Service:
-cd dev_assistant_crew/mcp_services/git_service
-uvicorn main:app --reload --port 8000
+Code structure 
 
 dev_assistant_crew/
 ├── venv/
@@ -27,3 +20,22 @@ dev_assistant_crew/
     │   ├── main.py
     │   └── requirements.txt
     └── ...
+
+To run the tool, first activate a virtual environment
+python -m venv venv
+.\venv\Scripts\activate
+
+Install dependencies
+
+pip install -r mcp_services/git_service/requirements.txt
+pip install -r crew_app/requirements.txt
+
+Local Testing of MCP Service:
+cd dev_assistant_crew/mcp_services/git_service
+uvicorn main:app --reload --port 8000
+
+uvicorn mcp_services.code_analysis_service.main:app --reload --port 8001
+
+Sample results for style check
+image.png
+image.png

@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 
-from . import git_operations
+import git_operations
 
 app = FastAPI(
     title="MCP Git Service",
@@ -20,18 +20,23 @@ app = FastAPI(
 class CloneRepoRequest(BaseModel):
     repo_url: str
     branch: str = "main"
-    local_path: Optional[str] = None # Relative path within temp_repos directory
+    local_path: Optional[str] = None # Local repo path  
 
 class RepoPathRequest(BaseModel):
-    repo_local_path: str # Relative path within temp_repos directory
+    repo_local_path: str # Local repo path
 
 class FileContentRequest(BaseModel):
-    repo_local_path: str # Relative path within temp_repos directory
+    repo_local_path: str # Local repo path
     file_path_in_repo: str # Relative path within the repository
 
 class ListContentsRequest(BaseModel):
-    repo_local_path: str # Relative path within temp_repos directory
+    repo_local_path: str # Local repo path
     path_in_repo: str  = "" # Relative path within the cloned repository
+
+class WriteFileRequest(BaseModel):
+    repo_local_path: str # Local repo path
+    file_path_in_repo: str # Relative path within the repository
+    content: str # The content to write to the file
 
 # --- API Endpoints for MCP Tools ---
 
@@ -84,6 +89,20 @@ def api_list_contents(request: ListContentsRequest):
     if result["status"] == "success":
         return {"success": True, "contents": result["contents"]}
     raise HTTPException(status_code=404, detail=result["message"])
+
+@app.post("/mcp/git/write_file", summary="Write content to a file in a git repository")
+def api_write_file(request: WriteFileRequest):
+    """
+    Writes content to a file in a cloned git repository. Overwrites the file if it exists.
+    """
+    print(f"Writing content to {request.file_path_in_repo} in repository at {request.repo_local_path}...")
+    result = git_operations.write_file_content(
+        repo_local_path=request.repo_local_path,
+        file_path_in_repo=request.file_path_in_repo,
+        content=request.content)
+    if result["status"] == "success":
+        return {"success": True, "message": result["message"]}
+    raise HTTPException(status_code=500, detail=result["message"])
 
 # health check endpoint
 @app.get("/mcp/git/health", summary="Health check endpoint")

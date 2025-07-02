@@ -186,3 +186,30 @@ def list_repo_contents(repo_local_path: str, path_in_repo: str = "") -> dict:
             "contents": []
         }
         
+def write_file_content(repo_local_path: str, file_path_in_repo: str, content: str) -> dict:
+    """
+    Writes content to a file in a git repository. Overwrites the file if it exists.
+    Args:
+        repo_local_path: The path to the git repository.
+        file_path_in_repo: The path to the file to write to.
+        content: The content to write to the file.
+    Returns:
+        status: success or error
+        message: success or error message
+    """
+    full_repo_path = repo_local_path
+    full_file_path = os.path.join(full_repo_path, file_path_in_repo)
+
+    try:
+        with open(full_file_path, "w", encoding="utf-8") as file:
+            file.write(content)
+        return {
+            "status": "success",
+            "message": f"File written successfully to {full_file_path}"
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"Error writing file: {str(e)}"
+        }
+        

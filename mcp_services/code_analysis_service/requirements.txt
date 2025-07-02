@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+pydantic
+flake8
+mangum # For AWS Lambda deployment later
