@@ -1,0 +1,7 @@
+crewai
+crewai[tools]
+langchain-aws # For Bedrock LLM
+# langchain-openai # If you want to use OpenAI locally for testing
+boto3
+requests # For calling your local MCP service
+python-dotenv # For managing environment variables
