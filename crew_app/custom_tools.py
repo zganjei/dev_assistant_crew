@@ -1,12 +1,13 @@
 import os
 import requests
 from crewai.tools import tool
+import datetime
 
 MCP_SERVICE_BASE_URL = "http://localhost:8000/mcp"
 
 class GitTools:
     @tool("Clone Git Repository")
-    def clone_repo(repo_url: str, branch: str = "main", local_path: str = None) -> str:
+    def clone_repo(repo_url: str, branch: str = "main") -> str:
         """
         Clones a git repository to a temporary directory.
         Args:
@@ -16,12 +17,16 @@ class GitTools:
         Returns:
             A string containing the local path where the repository was cloned to
         """
+        timestamp = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+        repo_name = repo_url.split('/')[-1].replace('.git', '')
+        # Create a mock local path, in a real scenario this would be a real directory
+        local_path = os.path.join("temp_repos", f"{repo_name}_{timestamp}")
         response = requests.post(f"{MCP_SERVICE_BASE_URL}/git/clone", json={
             "repo_url": repo_url,
             "branch": branch,
             "local_path": local_path
         })
-        print(f".............................check {response}")
+        
         response.raise_for_status()
         data = response.json()
         if data.get("success"):
@@ -38,7 +43,6 @@ class GitTools:
         Returns:
             A string containing the status of the repository
         """
-        print(f"222222.........................check ")
         response = requests.post(f"{MCP_SERVICE_BASE_URL}/git/status", json={
             "repo_local_path": repo_local_path
         })
@@ -67,7 +71,6 @@ class GitTools:
         Returns:
             A string containing the content of the file
         """
-        print(f"333333.........................check ")
         response = requests.post(f"{MCP_SERVICE_BASE_URL}/git/read_file", json={
             "repo_local_path": repo_local_path,
             "file_path_in_repo": file_path_in_repo
@@ -88,7 +91,6 @@ class GitTools:
         Returns:
             A string containing the contents of the directory
         """
-        print(f"444444.........................check ")
         response = requests.post(f"{MCP_SERVICE_BASE_URL}/git/list_contents", json={
             "repo_local_path": repo_local_path,
             "path_in_repo": path_in_repo

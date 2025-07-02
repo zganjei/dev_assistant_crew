@@ -110,7 +110,8 @@ def read_file_content(repo_local_path: str, file_path_in_repo: str) -> dict:
         message: success or error message
         data: content of the file
     """
-    full_repo_path = os.path.join(TEMP_REPO_DIR, repo_local_path)
+    # full_repo_path = os.path.join(TEMP_REPO_DIR, repo_local_path)
+    full_repo_path = repo_local_path
     full_file_path = os.path.join(full_repo_path, file_path_in_repo)
 
     if not os.path.exists(full_file_path):
@@ -150,8 +151,11 @@ def list_repo_contents(repo_local_path: str, path_in_repo: str = "") -> dict:
         message: success or error message
         data: list of files and directories
     """
-    full_path = os.path.join(TEMP_REPO_DIR, repo_local_path, path_in_repo)
+    # full_path = os.path.join(TEMP_REPO_DIR, repo_local_path, path_in_repo)
+    full_path = os.path.join(repo_local_path, path_in_repo)
+
     print(f"Listing contents of {full_path}...")
+
     if not os.path.exists(full_path):
         return {
             "status": "error",

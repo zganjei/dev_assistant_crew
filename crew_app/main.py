@@ -8,7 +8,7 @@ from custom_tools import GitTools
 # import openai api key from .env file
 load_dotenv()
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+llm = ChatOpenAI(model="gpt-4.1", temperature=0.7)
 
 # --- Define the Crew ---
 
@@ -30,21 +30,21 @@ git_commander = Agent(
 # Define the tasks
 # Task to clone a repository
 clone_repo_task = Task(
-    description="Clone the repository '{repo_url}' into a local path. Once cloned, store the local path in the variable 'repo_local_path' as it will be used in other tasks.",
+    description="Clone the repository '{repo_url}' into a local path. Once cloned, the tool will return this local path as it will be used in other tasks.",
     agent=git_commander,
-    expected_output="The local path where the repository was cloned to"
+    expected_output="return the local path where the repository was cloned to"
 )
 
 # Task to get the status of a repository
 get_repo_status_task = Task(
-    description="Get the status of the repository at '{repo_local_path}'.Report the branch, if there are any uncommitted changes, and the last commit message.",
+    description=" use the local path provided by the previous task's output. Report the branch, if there are any uncommitted changes, and the last commit message.",
     agent=git_commander,
     expected_output="A summary of the repository status"
 )
 
 # Task to list the contents of a repository
 list_repo_contents_task = Task(
-    description="List the contents of the repository at '{repo_local_path}'. Report the files and directories in the root directory.",
+    description="List the contents of the repository at the local path that you just checked its status. Report the files and directories in the root directory.",
     agent=git_commander,
     expected_output="A clear list of the files and directories of the root directory"
 )
@@ -70,19 +70,9 @@ if __name__ == "__main__":
     }
 
     print(f"\n-- Cloning repository {test_repo_url} --")
-    clone_result = developer_asistant_crew.kickoff(inputs={"repo_url": test_repo_url})
-    print(f".............................check {clone_result}")
-    cloned_path_info = clone_result.split("local path where the repository was cloned, e.g., '")[1].split("'")[0]
-    print(f"Repository cloned to: {cloned_path_info}")
-
-    print(f"\n-- Getting repository status --")
-    status_result = developer_asistant_crew.kickoff(inputs={"repo_local_path": cloned_path_info})
-    print(status_result)
-
-    print(f"\n-- Listing repository contents --")
-    contents_result = developer_asistant_crew.kickoff(inputs={"repo_local_path": cloned_path_info})
-    print(contents_result)
-
+    final_result = developer_asistant_crew.kickoff(inputs={"repo_url": test_repo_url})
+    print(f"\n## Crew work finished! Final result:")
+    print(final_result)
     print(f"\n-- Crew completed tasks--")
     
 
